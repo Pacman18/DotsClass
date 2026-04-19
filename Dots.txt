@@ -1,0 +1,91 @@
+Dots 사용하기 
+
+--------------------- Scene 구성하기 ----------------------------------------------
+
+1. SubScene에서 구성해야함.
+
+2. Entity로 바꿀 오브젝트에 (MonoScript) MonoBehavior 콤포넌트가 붙긴함 
+-> Baker클래스를 내부에선언하고.  Baker<MonoScript> 으로 상속해준다.
+-> override Bake(MonoScript authoring) 함수를 정의해줘야한다.
+
+
+
+Job 시스템
+
+암기 포인트 
+- Job은  deltaTime값을 모른다. 그러므로 반드시 Time이 필요한곳에는 Job내부에 선언해줘야 내부에서 계산이 가능하다.
+- 관리되지 않는 변수를 사용해야한다. NativeArray<> 유니티에서 제공하는 쓰레드에 안전한 구조체로 읽기쓰기가 가능하다.
+4프레임 이하일때는 TempJob으로 메모리 할당, 그 외에는 Persistent로 메모리 할당할 것.
+Pure한 데이터만 가능 int, float, bool 과 같은것들...
+- 종속성이 가능함. Schedule로 돌릴때 파라미터로 부모 Job을 넣으면 부모것이 끝나면 자식 Job이 돌아감 
+
+
+
+-------------------------- Job 시스템만 사용할경우 ------------------------------------------
+IJob 인터페이스 사용 
+
+Excute 함수 구현
+
+IJobParallelForTransform ---> 트랜스폼 전용 인터페이스가 있음
+
+사용방법 
+
+1. IJob을 상속받는 MyJob Struct를 만든다.
+
+2. 사용할 곳에서  new MyJob으로 필요한 데이터값을 넣고 
+myjob.Schedule()로 실행하며 JobHandle러로 Complete로 완료 확인한다.
+
+* 트랜스폼 전용 접근 Native클래스 ( Dispose를 해줘야함 )
+- TransformAccessArray  
+(new TransformAccessArray(TrasnformsList))
+CharacterController처럼 자동으로 포지션이 변경된다
+IJobParallelForTransform Excute에서 TransformAccess를 파라미터로 받을 수가 있다.
+
+
+
+-------------------------- Entity와 같이 사용 할 경우-----------------------------------------
+IJobEntity - Entity가 있는것들 상대로 업데이트
+
+Execute를 Overide를 해야하며 선언한 Icomponent Data를 파라미터로 추가할 수 있다. 
+ex) Execute(Entity projectileEntity, [ChunkIndexInQuery] int chunkIndex, ref LocalTransform transform, in Projectile projectile)
+
+
+
+============================= Entity 와 GameObject 이해하기 ====================================================
+
+
+Entity 정의 - GameObject를 가르키는 특정 값
+
+GameObject에서 사용할 원시Component 데이터를 
+Entity에 연동해야 ECS로 구현이 가능하다.
+
+- 선언 -
+MonoBehavior 에서 사용될 변수를 Icomponent를 상속받는 데이터용 구조체를 선언한다.
+
+
+- Bake - ( Entity 에 데이터를 붙여주는 단계 )
+Bake 단계를 거쳐서 Entity용 Component에 붙여줘야한다. ex) override Baker<Icomponent> ----> 요런식으로 댐 
+
+1. Entity가져오기 : GetEntity() // 아마도 현재 오브젝트에 대한 Entity를 생성하는듯하다.
+2. AddComponent( 1에서 가져온 Entity , 선언한 IComponent 구조체 )
+
+
+Entity로 인스턴스화 하기 
+
+
+
+======================================= ISystem 이해하기 =============================================================
+
+독립적으로 돌아가는 스크립트임  ISystem 인터페이스를 상속받으면 UnManaged 로 돌아가는 프로세스가 된다. 
+
+state.RequireForUpdate<T> --> T가 단 1개라도 존재하기 전에 OnUpdate가 호출되는것을 막는 등록 함수 
+-> 어트리뷰트로 선언이 가능하다. 
+
+OnCreate(ref SystemState state)
+OnUpdate(ref SystemState state)
+
+
+ISystem 관련 어트리뷰트	설명
+[UpdateBefore(typeof(X))]	특정 시스템 X보다 먼저 실행됨
+[UpdateAfter(typeof(X))]	특정 시스템 X보다 나중에 실행됨
+[DisableAutoCreation]	자동으로 생성되지 않게 막음 (직접 수동 생성)

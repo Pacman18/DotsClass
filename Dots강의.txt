@@ -1,0 +1,119 @@
+Dots 강의 
+
+Dots의 ECS시스템은 Entites,Component,System 이 3가지의 약자이다. 
+
+1. 패키지 설치 
+
+Entites 설치 
+
+- Window에 Entites전용 메뉴가 생김 열어보자 
+- Hierarchy , System, 
+
+Hierarchy - NewGameObject에 DefaultWorldInitializeProxy라는 컴포넌트가 달려있는것을 볼 수 있다.
+
+
+SubScene을 만들어서 넣어보자 
+
+-왜 SubScene을 만들어야해요? ----> ECS는 나중에 만들어진 시스템이라 기본Unity 시스템과 호환되지 않기에
+
+SubScene오브젝트에 어떤 스크립트가 붙어 있는지 잘 확인하자
+
+이상태에서 플레이를 해보고 각각의 하이어라키에 어떤 것들이 표기되는지 확인해보자 
+
+
+- 서브신에 큐브를 만들어보자. --> 안보인다? Entity Graphics 패키지를 설치해보자
+( 에디터 에러가 나면 프로젝트를 다시 시작하면 된다 - Entity 인스펙터랑 여러가지가 새로 적용되느라 에러가 나는것임  )
+
+
+- 이제 Dots의 오브젝트를 어떻게 세팅하는지 알게되었다. 
+
+
+자 이제 궁금한것은 내가 이 큐브를 내 마음대로 할 줄 알아야한다. 
+
+전체적인 Dots의 흐름을 이제 짚어보자. 
+
+이렇게 여러개의 데이터를 한번에 모아두고 -[][][][[][[[] 연산하는것이 Dots 의 특징이라고 생각하면된다 
+
+----------예를 들어서 설명하자면 --------------------------
+( Monster라는 MonoBehavior이라는 스크립트를 붙이 모든 게임 오브젝트를 움직이는것은 MonsterSystem이라는 스크립트 혼자 움직인다. )
+
+그 뭉텅이를 ArchType라고 하고 그 ArchType단위로 연산이 이루어지는데 
+
+ArchType은 컴포넌트가 몇개 붙었냐에따라 다르게 정의된다. 
+
+( 이것은 결국 청크라는 메모리에 저장된다 ) 
+
+청크에서 데이터를 가져올때는 쿼리문으로 가져오며, (  DB와 비슷한 흐름 ) 
+
+중요한건은 내가 필요할때만 데이터를 가져와 변경해야지 데이터를 어딘가에 가지고 있는다는의미는 이제 버린다. 
+
+즉 Class의 참조 개념보다는 Value값으로 계속 사용한다고 보면된다. 
+
+여기서 중요한것은 저 청크단위에서 어떻게 내가 가져오고싶은것을 가져오냐.!  내 컴포넌트를 추가한다.
+
+
+---- Cube에 Baker클래스 추가한이후 잘되는지 해보자 
+
+잘되면 Hierarchy랑 Inspector에서 각각 잘 나오는지 확인한이후 
+
+--- SantaCubeSystem을 만들어보자. 
+
+public void OnCreate(ref SystemState state)
+public void OnUpdate(ref SystemState state)
+public void OnDestroy(ref SystemState state)
+
+Unity Entities에서 SystemAPI.Query는 “이 컴포넌트들을 모두 가진 엔티티”를 찾는 기본 도구입니다. 지금 쓰신 한 줄을 기준으로만 정리합니다.
+foreach (var (a, b, ...) in SystemAPI.Query<T1, T2, ...>())
+
+ex) 
+foreach (var (cube, transform) in SystemAPI.Query<RefRW<SantaCube>, RefRW<LocalTransform>>())
+{
+    ref var pos = ref transform.ValueRW.Position;  // 이동 등
+    var speed = cube.ValueRO.SomeField;             // SantaCube는 읽기만
+}
+
+
+---- Job System을 배워보자 ---------------
+
+Job은 유니티에서 사용가능한 멀티쓰레드 API다. 
+
+Dots의 ECS시스템과 별개라고 생각하면된다. 
+
+단 연산가능한것이 값타입위주 그리고 NativeArray등의 컨테이너만 가능하다. 
+
+new NativeArray<float>(count, Allocator.TYPE);
+Allocator타입은 잠깐쓰는거 계속쓸꺼 등등이 있다. 
+
+struct MyJob : IJob
+{
+	public int temn_1;
+	public temp_2;
+
+	public void Excute()
+	{
+		// temn_1 , temp2를 알아서 지지고 복고함. 	
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+
+
+
+
+
+
