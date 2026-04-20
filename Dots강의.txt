@@ -96,6 +96,34 @@ struct MyJob : IJob
 }
 
 
+----------------------------- Hybrid 타입 알아보기 ------------------------------------------------
+
+Mono월드에서 ECS월드 받아오기 
+var world = World.DefaultGameObjectInjectionWorld;
+
+EntityManager 받아오기 
+
+var entityManager = world.EntityManager;
+
+쿼리만들기 
+
+var entityQuery = entityManager.CreateEntityQuery(typeof(T));
+
+// 쿼리를  Mono에서 돌리기위한 변환 
+var entities = entityQuery.ToEntityArray(Allocator.Temp);
+
+foreach(var entity in entities)
+{
+     var santaCube = entityManager.GetComponentData<T>(entity);
+     Debug.Log("SantaCube: " + santaCube.number);
+}           
+
+
+
+
+
+
+
 
 
 

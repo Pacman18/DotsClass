@@ -56,7 +56,7 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "ECSBasicClass.sln",
+    "dotnet.defaultSolution": "DotsClass.sln",
     "dotrush.roslyn.projectOrSolutionFiles": [
         "c:\\Work\\ECSBasicClass\\ECSBasicClass.sln",
         "c:\\Work\\ECSBasicClass\\Library\\PackageCache\\com.unity.entities@8b72e8a7d7d1\\Unity.Entities\\SourceGenerators\\Source~\\SourceGenerators.sln",
