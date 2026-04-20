@@ -118,6 +118,20 @@ foreach(var entity in entities)
      Debug.Log("SantaCube: " + santaCube.number);
 }           
 
+----------- 싱글톤 만들기 ----------
+public struct GameConfig : IComponentData
+{
+    public float Difficulty;
+}
+
+
+ var gameConfig = SystemAPI.GetSingleton<GameConfig>();
+            Debug.Log("GameConfig: " + gameConfig.Difficulty);       
+
+2개 이상의 컴포넌트데이터 발생시 에러 나옴 
+
+
+
 
 
 

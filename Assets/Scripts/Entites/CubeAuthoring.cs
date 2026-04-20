@@ -1,5 +1,7 @@
 using UnityEngine;
 using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Rendering;
 
 
 namespace DotsStudy
@@ -17,12 +19,18 @@ namespace DotsStudy
             public override void Bake(CubeAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
+                var cubeEntity = GetEntity(authoring.cube, TransformUsageFlags.Dynamic);
                 AddComponent(entity, new SantaCube
                 {
                     number = authoring.number,
                     size = authoring.size,
                     YawRadians = 0f,
-                    cube = GetEntity(authoring.cube, TransformUsageFlags.Dynamic),
+                    cube = cubeEntity,
+                });
+
+                AddComponent(cubeEntity, new URPMaterialPropertyBaseColor
+                {
+                    Value = new float4(1f, 1f, 1f, 1f),
                 });
 
                 Debug.Log("Bake: " + authoring.number);
